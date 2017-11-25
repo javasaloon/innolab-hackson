@@ -47,7 +47,7 @@ public class BlockchainService {
 
         System.out.println("insert data ... ");
 
-        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
 
         BlockchainSession session = serviceFactory.createSession(userId);  //  ????
         String txHash = null;
@@ -65,7 +65,7 @@ public class BlockchainService {
             try {
                 txHash = ptx.getHash();
                 System.out.printf(txHash);
-                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                ptx.sign(user.getAddress(), user.getPrivKey());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -89,7 +89,7 @@ public class BlockchainService {
 
         System.out.println("create user ... ");
 
-        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
 
         BlockchainSession session = serviceFactory.createSession(userId);  //  ????
         String txHash = null;
@@ -108,7 +108,7 @@ public class BlockchainService {
             try {
                 txHash = ptx.getHash();
                 System.out.printf(txHash);
-                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                ptx.sign(user.getAddress(), user.getPrivKey());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -131,7 +131,7 @@ public class BlockchainService {
 
         System.out.println("create user ... ");
 
-        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
 
         BlockchainSession session = serviceFactory.createSession(userId);  //  ????
 
@@ -145,13 +145,13 @@ public class BlockchainService {
             info.setDescription("InnoLab Hackson Asset Account");
 
 
-            tx.prepare(service.createAccount(identity, info, user.getAccount().getAddress(), null, false), String.class);
+            tx.prepare(service.createAccount(identity, info, user.getAddress(), null, false), String.class);
 
             PreparedTransaction ptx = tx.complete();
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
-                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                ptx.sign(user.getAddress(), user.getPrivKey());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -176,7 +176,7 @@ public class BlockchainService {
 
         System.out.println("create user ... ");
 
-        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
 
         BlockchainSession session = serviceFactory.createSession(userId);
 
@@ -194,7 +194,7 @@ public class BlockchainService {
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
-                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                ptx.sign(user.getAddress(), user.getPrivKey());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -217,8 +217,8 @@ public class BlockchainService {
 
         System.out.println("create user ... ");
 
-        SecureIdentity appId = new SecureIdentity(app.getAccount().getAddress(), app.getPrivKey());
-        SecureIdentity operatorId = new SecureIdentity(operator.getAccount().getAddress(), operator.getPrivKey());
+        SecureIdentity appId = new SecureIdentity(app.getAddress(), app.getPrivKey());
+        SecureIdentity operatorId = new SecureIdentity(operator.getAddress(), operator.getPrivKey());
         BlockchainSession session = serviceFactory.createSession(appId, operatorId);
 
         TransactionTemplate tx = session.beginTransaction();
@@ -239,9 +239,9 @@ public class BlockchainService {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
                 newEntry = resultHolder.getResult();
-                newAccount.setAccount(newEntry);
+                newAccount.setAddress(newEntry.getAddress());
                 newAccount.setPrivKey(identity.getAuthPrivateKey().getEncodedValue());
-                ptx.sign(operator.getAccount().getAddress(), operator.getPrivKey());
+                ptx.sign(operator.getAddress(), operator.getPrivKey());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -259,7 +259,7 @@ public class BlockchainService {
 
     public BlockchainAccount createOperator(BlockchainAccount parentAccount) {
         System.out.println("create operator ... ");
-        String address = parentAccount.getAccount().getAddress();
+        String address = parentAccount.getAddress();
         String privKey = parentAccount.getPrivKey();
 
         SecureIdentity channel = new SecureIdentity(address, privKey);
@@ -284,7 +284,7 @@ public class BlockchainService {
                 System.out.printf(txHash);
                 newEntry = resultHolder.getResult();
                 ptx.sign(address, privKey);
-                newAccount.setAccount(newEntry);
+                newAccount.setAddress(newEntry.getAddress());
                 newAccount.setPrivKey(identity.getAuthPrivateKey().getEncodedValue());
                 try {
                     ptx.commit();
@@ -307,7 +307,7 @@ public class BlockchainService {
     public BlockchainAccount createApp(BlockchainAccount account) {
         System.out.println("create app ... ");
         Application application;
-        String address = account.getAccount().getAddress();
+        String address = account.getAddress();
         String privKey = account.getPrivKey();
         SecureIdentity channel = new SecureIdentity(address, privKey);
         BlockchainSession session = serviceFactory.createSession(channel);
@@ -331,7 +331,7 @@ public class BlockchainService {
                 System.out.printf(txHash);
                 application = resultHolder.getResult();
                 ptx.sign(address, privKey);
-                newAccount.setAccount(application);
+                newAccount.setAddress(application.getAddress());
                 newAccount.setPrivKey(identity.getAuthPrivateKey().getEncodedValue());
                 try {
                     ptx.commit();
@@ -376,7 +376,7 @@ public class BlockchainService {
                 System.out.printf(txHash);
                 ptx.sign(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
                 tenant = resultHolder.getResult();
-                newAccount.setAccount(tenant);
+                newAccount.setAddress(tenant.getAddress());
                 newAccount.setPrivKey(identity.getAuthPrivateKey().getEncodedValue());
                 try {
                     ptx.commit();
