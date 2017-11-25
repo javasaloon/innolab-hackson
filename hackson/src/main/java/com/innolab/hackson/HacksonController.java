@@ -93,7 +93,8 @@ public class HacksonController {
         battle.setId(event_id);
         event_id++;
         int damage = user.getPower();
-        double r2 = getRandom(80, 100) / 100.0;
+        double r2 = getRandom(80, 120) / 100.0;
+        System.out.println(r2);
         damage = (int)((double)damage*r2);
         System.out.println(damage);
         user.setPower(damage);
@@ -134,12 +135,14 @@ public class HacksonController {
     public List<Battle> get_battle_List(@RequestParam(value = "boss_id") long boss_id, @RequestParam(value = "event_id") long event_id) {
         List<Battle> list = map.get(boss_id);
         int start_index = ((int) event_id) - 1;
-        if(start_index >= list.size()) start_index = list.size()-1;
+        if(start_index >= list.size()){
+            return null;
+        }
         if(start_index < 0) start_index = 0;
         return list.subList(start_index, list.size());
     }
 
-    private static long getRandom(int min, int max) {
-        return Math.round(Math.random() * (max - min) + min);
+    private static double getRandom(int min, int max) {
+        return (Math.random() * (max - min) + min);
     }
 }
