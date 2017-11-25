@@ -14,6 +14,7 @@ public class HacksonController {
 
     //    private static final String template = "Hello, %s!";
 //    private final AtomicLong counter = new AtomicLong();
+    boolean isDead = false;
     int event_id = 1;
     final static String[] bossName = {"boss1", "boss2", "boss3"};
     static Map<Long, List<Battle>> map = new HashMap<>();
@@ -25,7 +26,7 @@ public class HacksonController {
         final int[] max_health = {10000, 10000, 10000};
         final double[] location_x = {-74.0066, -73.9966, -73.98660000000001};
         final double[] location_y = {40.7135, 40.71351, 40.7235};
-        int[] cur_health = {21, 10000, 10000};
+        int[] cur_health = {10000, 10000, 10000};
         boolean[] cur_status = {true, true, true};
         int[] r = {500, 400, 666};
 
@@ -61,7 +62,7 @@ public class HacksonController {
         final Long[] userId = {1l, 2l, 3l};
         final Long[] groupId = {-1l, 1l, 1l};
         final int[] level = {1, 1, 2};
-        final int[] power = {10, 100, 200};
+        final int[] power = {1000, 1200, 1500};
         final double[] original_location_x = {-74.0036, -74.01100000000001, -74.00460000000001};
         final double[] original_location_y = {40.7113, 40.711000000000006, 40.715500000000006};
 
@@ -83,28 +84,39 @@ public class HacksonController {
     @RequestMapping(path = "/battle", method = RequestMethod.POST)
     public Battle post_battle_List(@RequestParam(value = "boss_id") long boss_id, @RequestParam(value = "player_id") long player_id) {
 
+        boolean flag = true;
         List<Battle> battleList = map.get(boss_id);
         Boss boss = (Boss) bossList.get(((int) boss_id) - 1).clone();
-        Player user = get_userList("World").get(((int) player_id) - 1);
+        Player user = (Player) get_userList("World").get(((int) player_id) - 1).clone();
         Battle battle = new Battle();
         battle.setTimestamp(System.currentTimeMillis());
         battle.setId(event_id);
         event_id++;
         int damage = user.getPower();
+        double r2 = getRandom(80, 100) / 100.0;
+        damage = (int)((double)damage*r2);
+        System.out.println(damage);
+        user.setPower(damage);
         battle.setDamage(damage);
         battle.setUser(user);
         int cur_heal = boss.getCur_health() - damage;
 //            System.out.println(cur_heal);
         boss.setCur_health(cur_heal);
         bossList.get(((int) boss_id) - 1).setCur_health(cur_heal);
-        if (boss.getCur_health() <= 0) {
-            boss.setLive(false);
+        if(!isDead) {
+            if (boss.getCur_health() <= 0) {
+                boss.setLive(false);
+                boss.setCur_health(0);
+                isDead = true;
 
-            blockchainManager.transferAsserts(boss_id, player_id, 10);
+                blockchainManager.transferAsserts(boss_id, player_id, 10);
 
+            }
+            battle.setB(boss);
+            battleList.add(battle);
+        }else{
+            event_id--;
         }
-        battle.setB(boss);
-        battleList.add(battle);
         return battle;
     }
 
@@ -127,4 +139,7 @@ public class HacksonController {
         return list.subList(start_index, list.size());
     }
 
+    private static long getRandom(int min, int max) {
+        return Math.round(Math.random() * (max - min) + min);
+    }
 }
