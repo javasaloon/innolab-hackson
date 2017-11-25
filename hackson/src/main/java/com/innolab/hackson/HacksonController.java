@@ -1,5 +1,6 @@
 package com.innolab.hackson;
 
+import cn.bubi.baas.account.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,9 +27,11 @@ public class HacksonController {
         final double[] location_y = {40.7135, 40.71351, 40.7235};
         int[] cur_health = {21, 10000, 10000};
         boolean[] cur_status = {true, true, true};
+        int[] r = {500, 400, 666};
 
         for (int i = 0; i < bossName.length; i++) {
             Boss b = new Boss();
+            b.setR(r[i]);
             b.setId(bossId[i]);
             b.setName(bossName[i]);
             b.setMax_health(max_health[i]);
@@ -81,7 +84,7 @@ public class HacksonController {
     public Battle post_battle_List(@RequestParam(value = "boss_id") long boss_id, @RequestParam(value = "player_id") long player_id) {
 
         List<Battle> battleList = map.get(boss_id);
-        Boss boss = bossList.get(((int) boss_id) - 1);
+        Boss boss = (Boss) bossList.get(((int) boss_id) - 1).clone();
         Player user = get_userList("World").get(((int) player_id) - 1);
         Battle battle = new Battle();
         battle.setTimestamp(System.currentTimeMillis());
@@ -93,6 +96,7 @@ public class HacksonController {
         int cur_heal = boss.getCur_health() - damage;
 //            System.out.println(cur_heal);
         boss.setCur_health(cur_heal);
+        bossList.get(((int) boss_id) - 1).setCur_health(cur_heal);
         if (boss.getCur_health() <= 0) {
             boss.setLive(false);
 
@@ -104,10 +108,22 @@ public class HacksonController {
         return battle;
     }
 
+    @RequestMapping(path = "/path", method = RequestMethod.POST)
+    public Player post_path(@RequestParam(value = "player_id") long player_id,
+                            @RequestParam(value = "x") double x,
+                            @RequestParam(value = "y") double y) {
+        Player user = get_userList("World").get(((int) player_id) - 1);
+        Point p = new Point(x,y);
+        user.setLocation(p);
+        return user;
+    }
+
     @RequestMapping(path = "/battles", method = RequestMethod.GET)
     public List<Battle> get_battle_List(@RequestParam(value = "boss_id") long boss_id, @RequestParam(value = "event_id") long event_id) {
         List<Battle> list = map.get(boss_id);
         int start_index = ((int) event_id) - 1;
+        if(start_index >= list.size()) start_index = list.size()-1;
+        if(start_index < 0) start_index = 0;
         return list.subList(start_index, list.size());
     }
 
