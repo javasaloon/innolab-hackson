@@ -2,7 +2,7 @@ package com.innolab.hackson;
 
 public class ChaincodeData {
 
-    public String operation = "init";
+    public String operation = "init1";
 
     public String triger = "triger tx";
 

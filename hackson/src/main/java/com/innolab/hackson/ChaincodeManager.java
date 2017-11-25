@@ -21,20 +21,20 @@ public class ChaincodeManager {
     BlockchainDao dao = new BlockchainDao();
     BlockchainAccount tenant = dao.getAccount("tenant");
     BlockchainAccount app = dao.getAccount("app");
-    BlockchainAccount operator = dao.getAccount("operator");
+//    BlockchainAccount operator = dao.getAccount("operator");
     private static final String BAAS_HOST = "39.106.70.242";
     private static final int BAAS_PORT = 8080;
     private static final BlockchainServiceFactory serviceFactory = new BlockchainServiceFactory(BAAS_HOST, BAAS_PORT);
-
+    BossAccount boss1 = dao.read("boss1", BossAccount.class);
+    BlockchainAccount operator = boss1.getBlockchainAccount();
 
     public static void main(String[] args) {
-        ChaincodeManager manager = new ChaincodeManager();
 
-//        manager.deployChaincode();
+        ChaincodeManager manager = new ChaincodeManager();
+        manager.deployChaincode();
         manager.executeChaincode();
 
     }
-
 
 
     public void executeChaincode() {
@@ -44,13 +44,12 @@ public class ChaincodeManager {
 
         SecureIdentity appId = new SecureIdentity(app.getAddress(), app.getPrivKey());
         SecureIdentity operatorId = new SecureIdentity(operator.getAddress(), operator.getPrivKey());
-        BlockchainSession session = serviceFactory.createSession(appId, operatorId);
+        BlockchainSession session = serviceFactory.createSession(operatorId);
 
         TransactionTemplate tx = session.beginTransaction();
         BlockchainAccount newAccount = new BlockchainAccount();
         try {
             ContractManageService service = tx.forService(ContractManageService.class);
-
 
             ChaincodeData input = new ChaincodeData();
             service.execute(blockchainAccount.getAddress(), input);
@@ -84,7 +83,7 @@ public class ChaincodeManager {
 
         SecureIdentity appId = new SecureIdentity(app.getAddress(), app.getPrivKey());
         SecureIdentity operatorId = new SecureIdentity(operator.getAddress(), operator.getPrivKey());
-        BlockchainSession session = serviceFactory.createSession(appId, operatorId);
+        BlockchainSession session = serviceFactory.createSession(operatorId);
 
         TransactionTemplate tx = session.beginTransaction();
         BlockchainAccount newAccount = new BlockchainAccount();

@@ -94,21 +94,21 @@ public class BlockchainManager {
     public static void main(String[] args) {
         BlockchainManager manager = new BlockchainManager();
         List<BossAccount> bossList = manager.getAccounts(true, "boss");
-//        for (BossAccount boss : bossList) {
-//            System.out.println(boss);
-////            manager.issueAssets(boss, 10000);
-//            System.out.println("boss ---------- >" + manager.queryAsserts(boss));
-//        }
-
-        List<BossAccount> playerList = manager.getAccounts(false, "player");
-        for (BossAccount player : playerList) {
-            System.out.println(player);
-            System.out.println("player ---------- > " + manager.queryAsserts(player));
-
-//            manager.transferAsserts(bossList.get(1), player, 10);
-
-
+        for (BossAccount boss : bossList) {
+            System.out.println(boss);
+//            manager.issueAssets(boss, 10000);
+            System.out.println("boss ---------- >" + manager.queryAsserts(boss));
         }
+
+//        List<BossAccount> playerList = manager.getAccounts(false, "player");
+//        for (BossAccount player : playerList) {
+//            System.out.println(player);
+//            System.out.println("player ---------- > " + manager.queryAsserts(player));
+//
+////            manager.transferAsserts(bossList.get(1), player, 10);
+//
+//
+//        }
     }
 
 
