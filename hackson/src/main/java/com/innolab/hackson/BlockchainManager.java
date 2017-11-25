@@ -1,5 +1,8 @@
 package com.innolab.hackson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BlockchainManager {
     BlockchainService blockchainService = new BlockchainService();
     BlockchainDao dao = new BlockchainDao();
@@ -29,11 +32,35 @@ public class BlockchainManager {
         return bossAccount;
     }
 
+    public List<BossAccount> getAccounts(boolean isBoss, String name) {
+        List<BossAccount> accountList = new ArrayList<>();
+
+        if (isBoss) {
+            for (int i = 0; i < 3; i++) {
+                BossAccount account = dao.read("boss" + i, BossAccount.class);
+                accountList.add(account);
+            }
+
+        } else {
+            for (int i = 0; i < 10; i++) {
+                BossAccount account = dao.read("player" + i, BossAccount.class);
+                accountList.add(account);
+            }
+        }
+        return accountList;
+    }
 
     public static void main(String[] args) {
         BlockchainManager manager = new BlockchainManager();
+        List<BossAccount> list = manager.getAccounts(true, "boss");
+        for (BossAccount boss : list) {
+            System.out.println(boss);
+        }
+        list = manager.getAccounts(false, "player");
+        for (BossAccount boss : list) {
+            System.out.println(boss);
+        }
     }
-
 
 
     private static void initUsers(BlockchainManager manager) {
