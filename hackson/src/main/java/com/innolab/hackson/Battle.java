@@ -2,6 +2,16 @@ package com.innolab.hackson;
 
 public class Battle {
 
+    boolean is_reborn;
+
+    public boolean isIs_reborn() {
+        return is_reborn;
+    }
+
+    public void setIs_reborn(boolean is_reborn) {
+        this.is_reborn = is_reborn;
+    }
+
     int battle_id;
 
     long timestamp;
