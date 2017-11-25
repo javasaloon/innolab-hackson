@@ -1,4 +1,4 @@
-package hello;
+package com.innolab.hackson;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

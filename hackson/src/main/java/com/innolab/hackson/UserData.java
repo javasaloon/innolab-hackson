@@ -1,4 +1,4 @@
-package hello;
+package com.innolab.hackson;
 
 import cn.bubi.baas.base.BlockchainAddress;
 import cn.bubi.baas.base.PublicKey;

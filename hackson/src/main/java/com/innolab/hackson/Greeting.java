@@ -1,4 +1,4 @@
-package hello;
+package com.innolab.hackson;
 
 public class Greeting {
 

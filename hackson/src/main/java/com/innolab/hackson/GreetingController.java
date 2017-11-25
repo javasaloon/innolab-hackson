@@ -1,11 +1,11 @@
-package hello;
+package com.innolab.hackson;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/hello")
+@RequestMapping("/com/innolab/hackson")
 public class GreetingController {
 
     private static final String template = "Hello, %s!";

@@ -1,4 +1,4 @@
-package hello;
+package com.innolab.hackson;
 
 import cn.bubi.baas.account.AccountManageService;
 import cn.bubi.baas.account.Application;
@@ -25,12 +25,14 @@ public class BlockchainService {
 
         BlockchainAccount tenant = blockchainService.createTenant();
 
-        Application app = blockchainService.createApp(tenant);
+        BlockchainAccount app = blockchainService.createApp(tenant);
+
+
 
 
     }
 
-    private Application createApp(BlockchainAccount tenant) {
+    private BlockchainAccount createApp(BlockchainAccount tenant) {
         Application application;
         String address = tenant.getAccount().getAddress();
         String privKey = tenant.getPrivKey();
@@ -38,7 +40,7 @@ public class BlockchainService {
         BlockchainSession session = serviceFactory.createSession(channel);
 
         TransactionTemplate tx = session.beginTransaction();
-
+        BlockchainAccount blockchainAccount = new BlockchainAccount();
         try {
             AccountManageService accountManageService = tx.forService(AccountManageService.class);
             BlockchainCertificate blockchainCertificate = session.getSecureKeyGenerator().generateBubiCertificate();
@@ -56,6 +58,8 @@ public class BlockchainService {
                 System.out.printf(txHash);
                 application = resultHolder.getResult();
                 ptx.sign(address, privKey);
+                blockchainAccount.setAccount(application);
+                blockchainAccount.setPrivKey(blockchainCertificate.getAuthPrivateKey().getEncodedValue());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -70,7 +74,7 @@ public class BlockchainService {
             throw e;
         }
 
-        return application;
+        return blockchainAccount;
     }
 
     private BlockchainAccount createTenant() {
