@@ -8,7 +8,6 @@ import cn.bubi.baas.account.tenant.TenantManageService;
 import cn.bubi.baas.asset.*;
 import cn.bubi.baas.base.BlockchainCertificate;
 import cn.bubi.baas.base.security.SecureIdentity;
-import cn.bubi.baas.data.DataService;
 import cn.bubi.baas.sdk.*;
 
 public class BlockchainService {
@@ -110,48 +109,6 @@ public class BlockchainService {
 
 
             return assetQuantities;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    public String insertData(BlockchainAccount user) {
-
-        System.out.println("insert data ... ");
-
-        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
-
-        BlockchainSession session = serviceFactory.createSession(userId);  //  ????
-        String txHash = null;
-        TransactionTemplate tx = session.beginTransaction();
-        try {
-            DataService service = tx.forService(DataService.class);
-
-            AssetAccountInfo<String> info = new AssetAccountInfo<>();
-            info.setDescription("InnoLab Hackson issue Asset ");
-            BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
-
-            tx.prepare(service.insert(identity, new UserData()), String.class);
-
-            PreparedTransaction ptx = tx.complete();
-            try {
-                txHash = ptx.getHash();
-                System.out.printf(txHash);
-                ptx.sign(user.getAddress(), user.getPrivKey());
-                try {
-                    ptx.commit();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println(identity.getAddress());
-            return identity.getAddress();
 
         } catch (Exception e) {
             e.printStackTrace();
