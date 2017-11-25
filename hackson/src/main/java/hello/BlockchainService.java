@@ -8,10 +8,7 @@ import cn.bubi.baas.account.tenant.TenantInfo;
 import cn.bubi.baas.account.tenant.TenantManageService;
 import cn.bubi.baas.base.BlockchainCertificate;
 import cn.bubi.baas.base.security.SecureIdentity;
-import cn.bubi.baas.sdk.BlockchainServiceFactory;
-import cn.bubi.baas.sdk.BlockchainSession;
-import cn.bubi.baas.sdk.PreparedTransaction;
-import cn.bubi.baas.sdk.TransactionTemplate;
+import cn.bubi.baas.sdk.*;
 
 public class BlockchainService {
     private static final String ROOT_ADDRESS = "a001d3d4a9f436505c02f00945dced61cb9a5fd01df144";
@@ -23,19 +20,21 @@ public class BlockchainService {
 
     public static void main(String[] args) {
 
-        Tenant tenant = createTenant();
 
-        Application application = createApp(tenant);
+        BlockchainService blockchainService = new BlockchainService();
 
+        BlockchainAccount tenant = blockchainService.createTenant();
 
-
-
+        Application app = blockchainService.createApp(tenant);
 
 
     }
 
-    private static Application createApp(Tenant tenant) {
-        Application application;SecureIdentity channel = new SecureIdentity(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
+    private Application createApp(BlockchainAccount tenant) {
+        Application application;
+        String address = tenant.getAccount().getAddress();
+        String privKey = tenant.getPrivKey();
+        SecureIdentity channel = new SecureIdentity(address, privKey);
         BlockchainSession session = serviceFactory.createSession(channel);
 
         TransactionTemplate tx = session.beginTransaction();
@@ -50,12 +49,13 @@ public class BlockchainService {
 
             application = accountManageService.register(blockchainCertificate, info);
 
-            tx.prepare(application, Application.class);
+            ActionResultHolder<Application> resultHolder = tx.prepare(application, Application.class);
             PreparedTransaction ptx = tx.complete();
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
-                ptx.sign(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
+                application = resultHolder.getResult();
+                ptx.sign(address, privKey);
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -70,17 +70,16 @@ public class BlockchainService {
             throw e;
         }
 
-        application.setTenant(tenant.getCode());
         return application;
     }
 
-    private static Tenant createTenant() {
+    private BlockchainAccount createTenant() {
         SecureIdentity channel = new SecureIdentity(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
         BlockchainSession session = serviceFactory.createSession(channel);
 
         TransactionTemplate tx = session.beginTransaction();
 
-        Tenant tenant = null;
+        BlockchainAccount blockchainAccount = new BlockchainAccount();
 
         try {
             TenantManageService tenantManageService = tx.forService(TenantManageService.class);
@@ -90,14 +89,17 @@ public class BlockchainService {
 
 
             BlockchainCertificate blockchainCertificate = session.getSecureKeyGenerator().generateBubiCertificate();
-            tenant = tenantManageService.register(blockchainCertificate, tenantInfo);
+            Tenant tenant = tenantManageService.register(blockchainCertificate, tenantInfo);
 
-            tx.prepare(tenant, Tenant.class);
+            ActionResultHolder<Tenant> resultHolder = tx.prepare(tenant, Tenant.class);
             PreparedTransaction ptx = tx.complete();
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
                 ptx.sign(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
+                tenant = resultHolder.getResult();
+                blockchainAccount.setAccount(tenant);
+                blockchainAccount.setPrivKey(blockchainCertificate.getAuthPrivateKey().getEncodedValue());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -107,11 +109,14 @@ public class BlockchainService {
                 ptx.rollback();
                 throw e;
             }
+
         } catch (Exception e) {
             tx.cancel();
             throw e;
         }
-        return tenant;
+
+
+        return blockchainAccount;
     }
 
 
