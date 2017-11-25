@@ -16,20 +16,20 @@ public class HacksonController {
 //    private final AtomicLong counter = new AtomicLong();
     boolean isDead = false;
     int event_id = 1;
-    final static String[] bossName = {"boss1", "boss2", "boss3"};
+    final static String[] bossName = {"boss1", "boss2", "boss3", "boss4"};
     static Map<Long, List<Battle>> map = new HashMap<>();
     static List<Boss> bossList = new ArrayList<>(bossName.length);
     Long[] groupId = {-1l, -1l, -1l, -1l, -1l, -1l};
     BlockchainManager blockchainManager = new BlockchainManager();
 
     static {
-        final Long[] bossId = {1l, 2l, 3l};
-        final int[] max_health = {100000, 100000, 100000};
-        final double[] location_x = {-74.0066, -73.9966, -73.98660000000001};
-        final double[] location_y = {40.7135, 40.71351, 40.7235};
-        int[] cur_health = {100000, 100000, 100000};
-        boolean[] cur_status = {true, true, true};
-        int[] r = {500, 400, 666};
+        final Long[] bossId = {1l, 2l, 3l, 3l};
+        final int[] max_health = {100000, 100000, 100000, 100000};
+        final double[] location_x = {-74.0066, -73.9966, -73.9866,  -73.9566};
+        final double[] location_y = {40.7135, 40.71351, 40.7235, 40.7235,40.7535 };
+        int[] cur_health = {100000, 100000, 100000, 100000};
+        boolean[] cur_status = {true, true, true, true};
+        int[] r = {500, 400, 666, 400};
 
         for (int i = 0; i < bossName.length; i++) {
             Boss b = new Boss();
@@ -63,8 +63,8 @@ public class HacksonController {
         final Long[] userId = {1l, 2l, 3l, 4l, 5l, 6l};
         final int[] level = {1, 1, 2, 2, 1, 3};
         final int[] power = {1000, 1000, 1200, 1200, 1000, 1500};
-        final double[] original_location_x = {-74.0036, -74.01100000000001, -74.00460000000001, -73.0036, -73.01100000000001, -73.00460000000001};
-        final double[] original_location_y = {40.7113, 40.711000000000006, 40.715500000000006, 40.7113, 40.711000000000006, 40.715500000000006};
+        final double[] original_location_x = {-74.0036, -74.01000000000001, -74.00460000000001, -74.0050000000001, -74.0038000000001, -74.00220000000001};
+        final double[] original_location_y = {40.7113, 40.711000000000006, 40.715500000000006, 40.718, 40.729, 40.723};
 
         List<Player> userList = new ArrayList<>(userName.length);
         for (int i = 0; i < userName.length; i++) {
