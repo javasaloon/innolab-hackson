@@ -111,10 +111,10 @@ public class HacksonController {
         battle.setUser(user);
         int cur_heal = boss.getCur_health() - damage;
 //            System.out.println(cur_heal);
-        boss.setCur_health(cur_heal);
-        bossList.get(((int) boss_id) - 1).setCur_health(cur_heal);
+//        boss.setCur_health(cur_heal);
+//        bossList.get(((int) boss_id) - 1).setCur_health(cur_heal);
         if(!isDead) {
-            if (boss.getCur_health() <= 0) {
+            if (cur_heal <= 0) {
                 isDead = true;
                 boss.setLive(false);
                 boss.setCur_health(0);
@@ -123,6 +123,9 @@ public class HacksonController {
 
                 blockchainManager.transferAsserts(boss_id, player_id, 10);
 
+            }else {
+                boss.setCur_health(cur_heal);
+                bossList.get(((int) boss_id) - 1).setCur_health(cur_heal);
             }
             battle.setB(boss);
             battleList.add(battle);
