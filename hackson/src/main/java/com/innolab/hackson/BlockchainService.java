@@ -21,23 +21,50 @@ public class BlockchainService {
     private static final int BAAS_PORT = 8080;
     private static final BlockchainServiceFactory serviceFactory = new BlockchainServiceFactory(BAAS_HOST, BAAS_PORT);
 
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
+        BlockchainDao dao = new BlockchainDao();
         BlockchainService blockchainService = new BlockchainService();
 
-        BlockchainAccount tenant = blockchainService.createTenant();
+//        BlockchainAccount tenant = blockchainService.createTenant();
+//        dao.saveAccount("tenant", tenant);
+        BlockchainAccount tenant = dao.getAccount("tenant");
+        System.out.println(tenant);
 
-        BlockchainAccount app = blockchainService.createApp(tenant);
 
-        BlockchainAccount operator = blockchainService.createOperator(app);
+//        BlockchainAccount app = blockchainService.createApp(tenant);
+//        dao.saveAccount("app", app);
 
-        BlockchainAccount user = blockchainService.createUser(app, operator);
+        BlockchainAccount app = dao.getAccount("app");
+        System.out.println(app);
 
-        String asset = blockchainService.createAsset(user);
-        String assetAccount = blockchainService.createAssetAccount( user);
-        String txHash = blockchainService.issueAsset(asset, assetAccount, 3, user);
+//        BlockchainAccount operator = blockchainService.createOperator(app);
+//        dao.saveAccount("operator", operator);
 
-        String result = blockchainService.insertData(user);
+        BlockchainAccount operator = dao.getAccount("operator");
+        System.out.println(operator);
+
+//        BlockchainAccount user1 = blockchainService.createUser(app, operator);
+//        dao.saveAccount("user1", user1);
+//        BlockchainAccount user2 = blockchainService.createUser(app, operator);
+//        dao.saveAccount("user2", user2);
+
+
+        BlockchainAccount user1 = dao.getAccount("user1");
+        System.out.println(user1);
+        BlockchainAccount user2 = dao.getAccount("user2");
+        System.out.println(user2);
+
+
+
+
+
+//
+//        String asset = blockchainService.createAsset(user);
+//        String assetAccount = blockchainService.createAssetAccount( user);
+//        String txHash = blockchainService.issueAsset(asset, assetAccount, 3, user);
+//
+//        String result = blockchainService.insertData(user);
     }
 
     //???
