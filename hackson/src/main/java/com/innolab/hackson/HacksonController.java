@@ -115,6 +115,7 @@ public class HacksonController {
         bossList.get(((int) boss_id) - 1).setCur_health(cur_heal);
         if(!isDead) {
             if (boss.getCur_health() <= 0) {
+                isDead = true;
                 boss.setLive(false);
                 boss.setCur_health(0);
                 bossList.get(((int) boss_id) - 1).setCur_health(0);
