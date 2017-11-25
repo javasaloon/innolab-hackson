@@ -5,6 +5,10 @@ import cn.bubi.baas.account.Application;
 import cn.bubi.baas.account.tenant.Tenant;
 import cn.bubi.baas.account.tenant.TenantInfo;
 import cn.bubi.baas.account.tenant.TenantManageService;
+import cn.bubi.baas.asset.Asset;
+import cn.bubi.baas.asset.AssetAccountInfo;
+import cn.bubi.baas.asset.AssetInfo;
+import cn.bubi.baas.asset.AssetManageService;
 import cn.bubi.baas.base.BlockchainCertificate;
 import cn.bubi.baas.base.security.SecureIdentity;
 import cn.bubi.baas.sdk.*;
@@ -29,7 +33,98 @@ public class BlockchainService {
 
         BlockchainAccount user = blockchainService.createUser(app, operator);
 
+        String asset = blockchainService.createAsset(app, operator);
+        String assetAccount = blockchainService.createAssetAccount(app, operator);
 
+
+    }
+
+    private String createAssetAccount(BlockchainAccount app, BlockchainAccount user) {
+
+        System.out.println("create user ... ");
+
+        SecureIdentity appId = new SecureIdentity(app.getAccount().getAddress(), app.getPrivKey());
+        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+
+        BlockchainSession session = serviceFactory.createSession(appId, userId);  //  ????
+
+        TransactionTemplate tx = session.beginTransaction();
+        try {
+            AssetManageService service = tx.forService(AssetManageService.class);
+            BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
+
+
+            AssetAccountInfo<String> info = new AssetAccountInfo<>();
+            info.setDescription("InnoLab Hackson Asset Account");
+
+
+            tx.prepare(service.createAccount(identity, info, user.getAccount().getAddress(), null, false), String.class);
+
+            PreparedTransaction ptx = tx.complete();
+            try {
+                String txHash = ptx.getHash();
+                System.out.printf(txHash);
+                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(identity.getAddress());
+            return identity.getAddress();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    // ? can user create asset?
+    private String createAsset(BlockchainAccount app, BlockchainAccount user) {
+
+        System.out.println("create user ... ");
+
+        SecureIdentity appId = new SecureIdentity(app.getAccount().getAddress(), app.getPrivKey());
+        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+
+        BlockchainSession session = serviceFactory.createSession(appId, userId);
+
+        TransactionTemplate tx = session.beginTransaction();
+        try {
+            AssetManageService service = tx.forService(AssetManageService.class);
+            BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
+
+
+            AssetInfo<String>  info = new AssetInfo();
+            info.setDescription("InnoLab Hackson Asset");
+            tx.prepare(service.declare(identity, info), String.class);
+
+            PreparedTransaction ptx = tx.complete();
+            try {
+                String txHash = ptx.getHash();
+                System.out.printf(txHash);
+                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(identity.getAddress());
+            return identity.getAddress();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private BlockchainAccount createUser(BlockchainAccount app, BlockchainAccount operator) {
