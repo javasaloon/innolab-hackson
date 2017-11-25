@@ -22,8 +22,8 @@ public class HacksonController {
     static {
         final Long[] bossId = {1l, 2l, 3l};
         final int[] max_health = {10000, 10000, 10000};
-        final double[] location_x = {101.11, 101.12, 101.13};
-        final double[] location_y = {101.11, 101.12, 101.13};
+        final double[] location_x = {-74.0066, -73.9966, -73.98660000000001};
+        final double[] location_y = {40.7135, 40.71351, 40.7235};
         int[] cur_health = {21, 10000, 10000};
         boolean[] cur_status = {true, true, true};
 
@@ -54,13 +54,13 @@ public class HacksonController {
 
     @RequestMapping(path = "/players", method = RequestMethod.GET)
     public List<Player> get_userList(@RequestParam(value = "name", defaultValue = "World") String name) {
-        final String[] userName = {"user1", "user2", "user3", "user4", "user5"};
-        final Long[] userId = {1l, 2l, 3l, 4l, 5l};
-        final Long[] groupId = {-1l, -1l, 1l, 1l, 1l};
-        final int[] level = {1, 1, 2, 2, 3};
-        final int[] power = {10, 100, 200, 200, 300};
-        final double[] original_location_x = {101.21, 101.22, 101.23, 101.24, 101.25};
-        final double[] original_location_y = {101.21, 101.22, 101.23, 101.24, 101.25};
+        final String[] userName = {"user1", "user2", "user3"};
+        final Long[] userId = {1l, 2l, 3l};
+        final Long[] groupId = {-1l, 1l, 1l};
+        final int[] level = {1, 1, 2};
+        final int[] power = {10, 100, 200};
+        final double[] original_location_x = {-74.0036, -74.01100000000001, -74.00460000000001};
+        final double[] original_location_y = {40.7113, 40.711000000000006, 40.715500000000006};
 
         List<Player> userList = new ArrayList<>(userName.length);
         for (int i = 0; i < userName.length; i++) {
