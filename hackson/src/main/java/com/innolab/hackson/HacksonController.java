@@ -172,6 +172,7 @@ public class HacksonController {
         battle.setIs_reborn(true);
         event_id++;
         list.add(battle);
+        isDead = false;
         return battle;
     }
 
