@@ -24,10 +24,10 @@ public class HacksonController {
 
     static {
         final Long[] bossId = {1l, 2l, 3l};
-        final int[] max_health = {10000, 10000, 10000};
+        final int[] max_health = {100000, 100000, 100000};
         final double[] location_x = {-74.0066, -73.9966, -73.98660000000001};
         final double[] location_y = {40.7135, 40.71351, 40.7235};
-        int[] cur_health = {10000, 10000, 10000};
+        int[] cur_health = {100000, 100000, 100000};
         boolean[] cur_status = {true, true, true};
         int[] r = {500, 400, 666};
 
@@ -84,7 +84,6 @@ public class HacksonController {
     @RequestMapping(path = "/battle", method = RequestMethod.POST)
     public Battle post_battle_List(@RequestParam(value = "boss_id") long boss_id, @RequestParam(value = "player_id") long player_id) {
 
-        boolean flag = true;
         List<Battle> battleList = map.get(boss_id);
         Boss boss = (Boss) bossList.get(((int) boss_id) - 1).clone();
         Player user = (Player) get_userList("World").get(((int) player_id) - 1).clone();
@@ -104,7 +103,7 @@ public class HacksonController {
                     multi++;
                 }
             }
-            damage = damage*multi;
+            damage = damage*multi*10;
         }
         System.out.println(damage);
         user.setPower(damage);
