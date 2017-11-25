@@ -5,9 +5,7 @@ import cn.bubi.baas.account.Application;
 import cn.bubi.baas.account.tenant.Tenant;
 import cn.bubi.baas.account.tenant.TenantInfo;
 import cn.bubi.baas.account.tenant.TenantManageService;
-import cn.bubi.baas.asset.AssetAccountInfo;
-import cn.bubi.baas.asset.AssetInfo;
-import cn.bubi.baas.asset.AssetManageService;
+import cn.bubi.baas.asset.*;
 import cn.bubi.baas.base.BlockchainCertificate;
 import cn.bubi.baas.base.security.SecureIdentity;
 import cn.bubi.baas.data.DataService;
@@ -66,12 +64,45 @@ public class BlockchainService {
         System.out.println(assetAccount);
 
 
-//        String txHash = blockchainService.issueAsset(asset, assetAccount, 3, user);
+        String txHash = blockchainService.issueAsset(asset.getAddress(), assetAccount.getAddress(), 3, user1);
+
+        blockchainService.queryAsset(asset.getAddress(), assetAccount.getAddress(), 3, user1);
+
 //
 //        String result = blockchainService.insertData(user);
     }
 
     //???
+
+    public String queryAsset(String assetAddress, String assetAccountAddress, long amount, BlockchainAccount user) {
+
+        System.out.println("create user ... ");
+
+        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
+
+        BlockchainSession session = serviceFactory.createSession(userId);  //  ????
+        String txHash = null;
+
+        try {
+            BlockchainQuerier querier = session.getQuerier();
+            AssetQueryService service = querier.forService(AssetQueryService.class);
+
+
+            AssetQuantity[] assetQuantities = service.queryAssets(assetAccountAddress);
+
+            for (int i = 0; i < assetQuantities.length; i++) {
+                AssetQuantity quantity = assetQuantities[i];
+                System.out.println("getAmount ========== " + quantity.getAmount());
+            }
+
+
+            return txHash;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     public String insertData(BlockchainAccount user) {
