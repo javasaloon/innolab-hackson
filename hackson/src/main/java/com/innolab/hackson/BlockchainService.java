@@ -43,7 +43,7 @@ public class BlockchainService {
     //???
 
 
-    private String insertData(BlockchainAccount user) {
+    public String insertData(BlockchainAccount user) {
 
         System.out.println("insert data ... ");
 
@@ -85,7 +85,7 @@ public class BlockchainService {
     }
 
 
-    private String issueAsset(String assetAddress, String assetAccountAddress, long amount, BlockchainAccount user) {
+    public String issueAsset(String assetAddress, String assetAccountAddress, long amount, BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
@@ -127,7 +127,7 @@ public class BlockchainService {
         return null;
     }
 
-    private String createAssetAccount(BlockchainAccount user) {
+    public String createAssetAccount(BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
@@ -172,7 +172,7 @@ public class BlockchainService {
 
 
     // ? can user create asset?
-    private String createAsset(BlockchainAccount user) {
+    public String createAsset(BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
@@ -213,7 +213,7 @@ public class BlockchainService {
         return null;
     }
 
-    private BlockchainAccount createUser(BlockchainAccount app, BlockchainAccount operator) {
+    public BlockchainAccount createUser(BlockchainAccount app, BlockchainAccount operator) {
 
         System.out.println("create user ... ");
 
@@ -257,7 +257,7 @@ public class BlockchainService {
         return newAccount;
     }
 
-    private BlockchainAccount createOperator(BlockchainAccount parentAccount) {
+    public BlockchainAccount createOperator(BlockchainAccount parentAccount) {
         System.out.println("create operator ... ");
         String address = parentAccount.getAccount().getAddress();
         String privKey = parentAccount.getPrivKey();
@@ -304,7 +304,7 @@ public class BlockchainService {
     }
 
 
-    private BlockchainAccount createApp(BlockchainAccount account) {
+    public BlockchainAccount createApp(BlockchainAccount account) {
         System.out.println("create app ... ");
         Application application;
         String address = account.getAccount().getAddress();
@@ -350,7 +350,7 @@ public class BlockchainService {
         return newAccount;
     }
 
-    private BlockchainAccount createTenant() {
+    public BlockchainAccount createTenant() {
         System.out.println("create tenant ... ");
         SecureIdentity channel = new SecureIdentity(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
         BlockchainSession session = serviceFactory.createSession(channel);
