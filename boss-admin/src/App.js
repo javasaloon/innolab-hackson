@@ -31,7 +31,7 @@ class App extends Component {
                   <Header style={{ background: '#fff', padding: 0, fontSize: "20px", textAlign: "center"}}>
                     创建怪兽
                   </Header>
-                  <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, display: "block", overflow: "scroll" }}>
                     <Overview/>
                   </Content>
                 </Layout>
@@ -40,7 +40,7 @@ class App extends Component {
                   <Header style={{ background: '#fff', padding: 0, fontSize: "20px", textAlign: "center" }}>
                     奖励记录
                   </Header>
-                  <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, display: "flex", justifyContent: "center"}}>
+                  <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, display: "flex", justifyContent: "center", overflow: "scroll"}}>
                     <HistoryView/>
                   </Content>
                 </Layout>

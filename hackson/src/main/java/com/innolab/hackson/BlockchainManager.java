@@ -96,7 +96,7 @@ public class BlockchainManager {
         List<BossAccount> bossList = manager.getAccounts(true, "boss");
         for (BossAccount boss : bossList) {
             System.out.println(boss);
-//            manager.issueAssets(boss, 10000);
+            manager.issueAssets(boss, 10000);
             System.out.println("boss ---------- >" + manager.queryAsserts(boss));
         }
 
