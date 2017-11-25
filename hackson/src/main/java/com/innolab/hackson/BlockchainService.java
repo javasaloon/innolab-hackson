@@ -1,8 +1,7 @@
 package com.innolab.hackson;
 
-import cn.bubi.baas.account.AccountManageService;
+import cn.bubi.baas.account.*;
 import cn.bubi.baas.account.Application;
-import cn.bubi.baas.account.ApplicationInfo;
 import cn.bubi.baas.account.tenant.Tenant;
 import cn.bubi.baas.account.tenant.TenantInfo;
 import cn.bubi.baas.account.tenant.TenantManageService;
@@ -27,15 +26,62 @@ public class BlockchainService {
 
         BlockchainAccount app = blockchainService.createApp(tenant);
 
+        BlockchainAccount operator = blockchainService.createOperator(app);
 
 
 
     }
 
-    private BlockchainAccount createApp(BlockchainAccount tenant) {
+    private BlockchainAccount createOperator(BlockchainAccount parentAccount) {
+        String address = parentAccount.getAccount().getAddress();
+        String privKey = parentAccount.getPrivKey();
+
+        SecureIdentity channel = new SecureIdentity(address, privKey);
+        BlockchainSession session = serviceFactory.createSession(channel);
+
+        TransactionTemplate tx = session.beginTransaction();
+        BlockchainAccount newAccount = new BlockchainAccount();
+        try {
+            AccountManageService accountManageService = tx.forService(AccountManageService.class);
+            BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
+
+            AppOperatorInfo info = new AppOperatorInfo();
+            info.setDescription("InnoLab Hackson Operator");
+
+
+            AppOperator newEntry = accountManageService.register(identity, info);
+
+            ActionResultHolder<AppOperator> resultHolder = tx.prepare(newEntry, AppOperator.class);
+            PreparedTransaction ptx = tx.complete();
+            try {
+                String txHash = ptx.getHash();
+                System.out.printf(txHash);
+                newEntry = resultHolder.getResult();
+                ptx.sign(address, privKey);
+                newAccount.setAccount(newEntry);
+                newAccount.setPrivKey(identity.getAuthPrivateKey().getEncodedValue());
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                ptx.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            tx.cancel();
+            throw e;
+        }
+
+        return newAccount;
+    }
+
+
+    private BlockchainAccount createApp(BlockchainAccount account) {
         Application application;
-        String address = tenant.getAccount().getAddress();
-        String privKey = tenant.getPrivKey();
+        String address = account.getAccount().getAddress();
+        String privKey = account.getPrivKey();
         SecureIdentity channel = new SecureIdentity(address, privKey);
         BlockchainSession session = serviceFactory.createSession(channel);
 
