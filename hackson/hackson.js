@@ -7,7 +7,7 @@ function main(input)
 
   }
   return x = {
-               'name' : 'no'
+               'operation' : 'np'
              };
 
 }

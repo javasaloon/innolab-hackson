@@ -30,9 +30,8 @@ public class ChaincodeManager {
     public static void main(String[] args) {
         ChaincodeManager manager = new ChaincodeManager();
 
-
-        manager.deployChaincode();
-//        manager.executeChaincode();
+//        manager.deployChaincode();
+        manager.executeChaincode();
 
     }
 
@@ -42,8 +41,6 @@ public class ChaincodeManager {
 
         System.out.println("deployChaincode ... ");
         BlockchainAccount blockchainAccount = dao.read("chaincode", BlockchainAccount.class);
-
-
 
         SecureIdentity appId = new SecureIdentity(app.getAddress(), app.getPrivKey());
         SecureIdentity operatorId = new SecureIdentity(operator.getAddress(), operator.getPrivKey());
@@ -62,8 +59,6 @@ public class ChaincodeManager {
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
-
-
                 ptx.sign(operator.getAddress(), operator.getPrivKey());
                 try {
                     ptx.commit();
