@@ -87,7 +87,7 @@ public class BlockchainService {
 
     //???
 
-    public String queryAsset(String assetAddress, String assetAccountAddress, BlockchainAccount user) {
+    public AssetQuantity[] queryAsset(String assetAddress, String assetAccountAddress, BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
@@ -109,7 +109,7 @@ public class BlockchainService {
             }
 
 
-            return txHash;
+            return assetQuantities;
 
         } catch (Exception e) {
             e.printStackTrace();

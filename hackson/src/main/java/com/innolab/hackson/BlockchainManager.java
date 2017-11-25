@@ -1,5 +1,7 @@
 package com.innolab.hackson;
 
+import cn.bubi.baas.asset.AssetQuantity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,15 +52,44 @@ public class BlockchainManager {
         return accountList;
     }
 
+    public void issueAssets(BossAccount boss, int amount) {
+        blockchainService.issueAsset(boss.getAsset().getAddress(), boss.getAssetAccount().getAddress(), amount, boss.getBlockchainAccount());
+    }
+
+    public long queryAsserts(BossAccount boss) {
+        AssetQuantity[] assetQuantities = blockchainService.queryAsset(null, boss.getAssetAccount().getAddress(), boss.getBlockchainAccount());
+        if (assetQuantities.length>0){
+            return assetQuantities[0].getAmount();
+        }
+        return 0;
+    }
+
+    public void transferAsserts(BossAccount boss, BossAccount player, int amount) {
+
+        blockchainService.transferAsset(boss.getAsset().getAddress(), boss.getAssetAccount().getAddress(),
+                player.getAssetAccount().getAddress(), amount, boss.getBlockchainAccount());
+
+
+
+    }
+
     public static void main(String[] args) {
         BlockchainManager manager = new BlockchainManager();
-        List<BossAccount> list = manager.getAccounts(true, "boss");
-        for (BossAccount boss : list) {
+        List<BossAccount> bossList = manager.getAccounts(true, "boss");
+        for (BossAccount boss : bossList) {
             System.out.println(boss);
+//            manager.issueAssets(boss, 10000);
+            System.out.println("boss ---------- >" + manager.queryAsserts(boss));
         }
-        list = manager.getAccounts(false, "player");
-        for (BossAccount boss : list) {
-            System.out.println(boss);
+
+        List<BossAccount> playerList = manager.getAccounts(false, "player");
+        for (BossAccount player : playerList) {
+            System.out.println(player);
+            System.out.println("player ---------- > " + manager.queryAsserts(player));
+
+//            manager.transferAsserts(bossList.get(0), player, 10);
+
+
         }
     }
 
