@@ -4,16 +4,19 @@ import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/game")
 public class HacksonController {
 
-    private static final String template = "Hello, %s!";
-    private final AtomicLong counter = new AtomicLong();
+//    private static final String template = "Hello, %s!";
+//    private final AtomicLong counter = new AtomicLong();
     final static String[] bossName = {"boss1", "boss2", "boss3"};
+    static Map<Long, List<Battle>> map = new HashMap<>();
     static List<Boss> bossList = new ArrayList<>(bossName.length);
     static{
         final Long[] bossId = {1l, 2l, 3l};
@@ -33,6 +36,13 @@ public class HacksonController {
             b.setLocation(p);
             b.setLive(cur_status[i]);
             bossList.add(b);
+        }
+
+        for(int i = 0; i < bossName.length; i++){
+            if(!map.containsKey(bossList.get(i).boss_id)){
+                List<Battle> bl = new ArrayList<>();
+                map.put(bossList.get(i).boss_id, bl);
+            }
         }
     }
 
@@ -66,15 +76,12 @@ public class HacksonController {
         return userList;
     }
 
-    @RequestMapping(path="/battle", method = RequestMethod.GET)
-    public List<Battle> get_battle_List(@RequestParam(value="name", defaultValue="World") String name) {
-
-//        int damage = 10;
-        List<Battle> battleList = new ArrayList<>();
-        int event_id = 200;
-        //        TODO: dynamic data
-        Boss boss = (Boss) bossList.get(0).clone();
-        Player user = get_userList("World").get(0);
+    @RequestMapping(path="/battle", method = RequestMethod.POST)
+    public void post_battle_List(@RequestParam(value="boss_id") long boss_id,@RequestParam(value="player_id") long player_id) {
+        int event_id = 1;
+        List<Battle> battleList = map.get(boss_id);
+        Boss boss = (Boss) bossList.get(((int)boss_id)-1).clone();
+        Player user = get_userList("World").get(((int)player_id)-1);
         while(true){
             Boss boss_cur = (Boss) boss.clone();
             Battle battle = new Battle();
@@ -98,19 +105,13 @@ public class HacksonController {
                 battleList.add(battle);
             }
         }
-        return battleList;
     }
 
-
-
-//    @RequestMapping(method = RequestMethod.POST)
-//    public Greeting hello(@RequestBody Greeting input) {
-//        return input;
-//    }
-
-    @RequestMapping(path="/bosses", method = RequestMethod.POST)
-    public long post_boss_id(@RequestBody Boss boss) {
-        return boss.boss_id;
+    @RequestMapping(path="/battles", method = RequestMethod.GET)
+    public List<Battle> get_battle_List(@RequestParam(value="boss_id") long boss_id,@RequestParam(value="event_id") long event_id) {
+        List<Battle> list = map.get(boss_id);
+        int start_index = ((int)event_id)-1;
+        return list.subList(start_index, list.size());
     }
 
 }
