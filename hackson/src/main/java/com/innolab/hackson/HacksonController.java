@@ -117,7 +117,8 @@ public class HacksonController {
             if (boss.getCur_health() <= 0) {
                 boss.setLive(false);
                 boss.setCur_health(0);
-                isDead = true;
+                bossList.get(((int) boss_id) - 1).setCur_health(0);
+                bossList.get(((int) boss_id) - 1).setLive(false);
 
                 blockchainManager.transferAsserts(boss_id, player_id, 10);
 
