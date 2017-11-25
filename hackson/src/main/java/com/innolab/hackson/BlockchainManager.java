@@ -81,6 +81,10 @@ public class BlockchainManager {
             BossAccount player = dao.read("player" + player_id, BossAccount.class);
             blockchainService.transferAsset(boss.getAsset().getAddress(), boss.getAssetAccount().getAddress(),
                     player.getAssetAccount().getAddress(), amount, boss.getBlockchainAccount());
+
+            System.out.println("after transfer boss ---------- > " + queryAsserts(boss));
+            System.out.println("after transfer player ---------- > " + queryAsserts(player));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,7 +105,7 @@ public class BlockchainManager {
             System.out.println(player);
             System.out.println("player ---------- > " + manager.queryAsserts(player));
 
-//            manager.transferAsserts(bossList.get(0), player, 10);
+//            manager.transferAsserts(bossList.get(1), player, 10);
 
 
         }
