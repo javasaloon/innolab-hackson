@@ -1,6 +1,7 @@
 package com.innolab.hackson;
 
 import cn.bubi.baas.asset.AssetQuantity;
+import cn.bubi.baas.asset.AssetQueryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,14 +74,27 @@ public class BlockchainManager {
 
     }
 
+    public void transferAsserts(long boss_id, long player_id, int amount) {
+
+        try {
+            BossAccount boss = dao.read("boss" + boss_id, BossAccount.class);
+            BossAccount player = dao.read("player" + player_id, BossAccount.class);
+            blockchainService.transferAsset(boss.getAsset().getAddress(), boss.getAssetAccount().getAddress(),
+                    player.getAssetAccount().getAddress(), amount, boss.getBlockchainAccount());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void main(String[] args) {
         BlockchainManager manager = new BlockchainManager();
         List<BossAccount> bossList = manager.getAccounts(true, "boss");
-        for (BossAccount boss : bossList) {
-            System.out.println(boss);
-//            manager.issueAssets(boss, 10000);
-            System.out.println("boss ---------- >" + manager.queryAsserts(boss));
-        }
+//        for (BossAccount boss : bossList) {
+//            System.out.println(boss);
+////            manager.issueAssets(boss, 10000);
+//            System.out.println("boss ---------- >" + manager.queryAsserts(boss));
+//        }
 
         List<BossAccount> playerList = manager.getAccounts(false, "player");
         for (BossAccount player : playerList) {

@@ -17,6 +17,7 @@ public class HacksonController {
     final static String[] bossName = {"boss1", "boss2", "boss3"};
     static Map<Long, List<Battle>> map = new HashMap<>();
     static List<Boss> bossList = new ArrayList<>(bossName.length);
+    BlockchainManager blockchainManager = new BlockchainManager();
 
     static {
         final Long[] bossId = {1l, 2l, 3l};
@@ -94,6 +95,9 @@ public class HacksonController {
         boss.setCur_health(cur_heal);
         if (boss.getCur_health() <= 0) {
             boss.setLive(false);
+
+            blockchainManager.transferAsserts(boss_id, player_id, 10);
+
         }
         battle.setB(boss);
         battleList.add(battle);
