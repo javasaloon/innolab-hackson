@@ -136,7 +136,7 @@ public class HacksonController {
         List<Battle> list = map.get(boss_id);
         int start_index = ((int) event_id) - 1;
         if(start_index >= list.size()){
-            return null;
+            return new ArrayList<>();
         }
         if(start_index < 0) start_index = 0;
         return list.subList(start_index, list.size());
