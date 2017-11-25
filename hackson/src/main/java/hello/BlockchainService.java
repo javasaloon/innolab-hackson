@@ -1,5 +1,8 @@
 package hello;
 
+import cn.bubi.baas.account.AccountManageService;
+import cn.bubi.baas.account.Application;
+import cn.bubi.baas.account.ApplicationInfo;
 import cn.bubi.baas.account.tenant.Tenant;
 import cn.bubi.baas.account.tenant.TenantInfo;
 import cn.bubi.baas.account.tenant.TenantManageService;
@@ -9,7 +12,6 @@ import cn.bubi.baas.sdk.BlockchainServiceFactory;
 import cn.bubi.baas.sdk.BlockchainSession;
 import cn.bubi.baas.sdk.PreparedTransaction;
 import cn.bubi.baas.sdk.TransactionTemplate;
-import cn.bubi.baas.utils.http.HttpStatusException;
 
 public class BlockchainService {
     private static final String ROOT_ADDRESS = "a001d3d4a9f436505c02f00945dced61cb9a5fd01df144";
@@ -20,26 +22,35 @@ public class BlockchainService {
     private static final BlockchainServiceFactory serviceFactory = new BlockchainServiceFactory(BAAS_HOST, BAAS_PORT);
 
     public static void main(String[] args) {
-        UserData data = new UserData();
-        data.setId("12342312412312");
-        data.setName("Jacky");
+
+        Tenant tenant = createTenant();
+
+        Application application = createApp(tenant);
 
 
-        SecureIdentity channel = new SecureIdentity(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
+
+
+
+
+    }
+
+    private static Application createApp(Tenant tenant) {
+        Application application;SecureIdentity channel = new SecureIdentity(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
         BlockchainSession session = serviceFactory.createSession(channel);
+
         TransactionTemplate tx = session.beginTransaction();
 
         try {
-            TenantManageService tenantManageService = tx.forService(TenantManageService.class);
-
-            TenantInfo tenantInfo = new TenantInfo();
-            tenantInfo.setDescription("InnoLab Tenant");
-
-
+            AccountManageService accountManageService = tx.forService(AccountManageService.class);
             BlockchainCertificate blockchainCertificate = session.getSecureKeyGenerator().generateBubiCertificate();
-            Tenant tenant = tenantManageService.register(blockchainCertificate, tenantInfo);
 
-            tx.prepare(tenant, Tenant.class);
+            ApplicationInfo info = new ApplicationInfo();
+            info.setDescription("InnoLab Hackson App");
+
+
+            application = accountManageService.register(blockchainCertificate, info);
+
+            tx.prepare(application, Application.class);
             PreparedTransaction ptx = tx.complete();
             try {
                 String txHash = ptx.getHash();
@@ -47,7 +58,7 @@ public class BlockchainService {
                 ptx.sign(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
                 try {
                     ptx.commit();
-                } catch (HttpStatusException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } catch (Exception e) {
@@ -59,30 +70,49 @@ public class BlockchainService {
             throw e;
         }
 
-
-
+        application.setTenant(tenant.getCode());
+        return application;
     }
 
-//    private static void insert(UserData data) {
-//
-//        SecureIdentity user = new SecureIdentity(USER_ADDRESS, USER_PRIVATE_KEY);
-//
-//        BlockchainSession session = serviceFactory.createSession(channel);
-//
-//        BlockchainAddress dataBlockchainAddress = session.getSecureKeyGenerator().generateBubiAddress();
-//
-//        TransactionTemplate tx = session.beginTransaction();
-//        DataService dataService = tx.forService(DataService.class);
-//
-//        ActionResultHolder<String> insertResultHolder = tx.prepare(dataService.insert(dataBlockchainAddress, data), String.class);
-//
-//        PreparedTransaction ptx = tx.complete();
-//
-//        String txHash = ptx.getHash();
-//        String dataAddress = insertResultHolder.getResult();
-//
-//        ptx.sign(USER_ADDRESS, USER_PRIVATE_KEY);
-//
-//        ptx.commit();
-//    }
+    private static Tenant createTenant() {
+        SecureIdentity channel = new SecureIdentity(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
+        BlockchainSession session = serviceFactory.createSession(channel);
+
+        TransactionTemplate tx = session.beginTransaction();
+
+        Tenant tenant = null;
+
+        try {
+            TenantManageService tenantManageService = tx.forService(TenantManageService.class);
+
+            TenantInfo tenantInfo = new TenantInfo();
+            tenantInfo.setDescription("InnoLab Tenant");
+
+
+            BlockchainCertificate blockchainCertificate = session.getSecureKeyGenerator().generateBubiCertificate();
+            tenant = tenantManageService.register(blockchainCertificate, tenantInfo);
+
+            tx.prepare(tenant, Tenant.class);
+            PreparedTransaction ptx = tx.complete();
+            try {
+                String txHash = ptx.getHash();
+                System.out.printf(txHash);
+                ptx.sign(ROOT_ADDRESS, ROOT_PRIVATE_KEY);
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                ptx.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            tx.cancel();
+            throw e;
+        }
+        return tenant;
+    }
+
+
 }
