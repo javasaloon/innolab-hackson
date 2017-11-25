@@ -64,17 +64,29 @@ public class BlockchainService {
         System.out.println(assetAccount);
 
 
-        String txHash = blockchainService.issueAsset(asset.getAddress(), assetAccount.getAddress(), 3, user1);
+//        CardAccount assetAccount2 = blockchainService.createAssetAccount(user2);
+//        dao.saveAccount("user2-asset-account", assetAccount2);
 
-        blockchainService.queryAsset(asset.getAddress(), assetAccount.getAddress(), 3, user1);
+        CardAccount assetAccount2 = dao.read("user2-asset-account", CardAccount.class);
+        System.out.println(assetAccount2);
 
+        blockchainService.queryAsset(asset.getAddress(), assetAccount2.getAddress(), user2);
+
+
+//        String txHash = blockchainService.issueAsset(asset.getAddress(), assetAccount.getAddress(), 3, user1);
+//
+        blockchainService.queryAsset(asset.getAddress(), assetAccount.getAddress(), user1);
+//
+        blockchainService.transferAsset(asset.getAddress(), assetAccount.getAddress(), assetAccount2.getAddress(), 3, user1);
+        blockchainService.queryAsset(asset.getAddress(), assetAccount.getAddress(), user1);
+        blockchainService.queryAsset(asset.getAddress(), assetAccount2.getAddress(), user2);
 //
 //        String result = blockchainService.insertData(user);
     }
 
     //???
 
-    public String queryAsset(String assetAddress, String assetAccountAddress, long amount, BlockchainAccount user) {
+    public String queryAsset(String assetAddress, String assetAccountAddress, BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
@@ -147,6 +159,48 @@ public class BlockchainService {
     }
 
 
+    public String transferAsset(String assetAddress, String transferorAccount, String transfereeAccount, long amount, BlockchainAccount user) {
+
+        System.out.println("create user ... ");
+
+        SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
+
+        BlockchainSession session = serviceFactory.createSession(userId);  //  ????
+        String txHash = null;
+        TransactionTemplate tx = session.beginTransaction();
+        try {
+            AssetManageService service = tx.forService(AssetManageService.class);
+
+// it needs transaction actually
+            AssetQuantity qutity = new AssetQuantity();
+            qutity.setAmount(amount);
+            qutity.setAssetAddress(assetAddress);
+            service.transfer(qutity, transferorAccount, transfereeAccount);
+
+
+            PreparedTransaction ptx = tx.complete();
+            try {
+                txHash = ptx.getHash();
+                System.out.printf(txHash);
+                ptx.sign(user.getAddress(), user.getPrivKey());
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(txHash);
+            return txHash;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public String issueAsset(String assetAddress, String assetAccountAddress, long amount, BlockchainAccount user) {
 
         System.out.println("create user ... ");
@@ -159,10 +213,7 @@ public class BlockchainService {
         try {
             AssetManageService service = tx.forService(AssetManageService.class);
 
-            AssetAccountInfo<String> info = new AssetAccountInfo<>();
-            info.setDescription("InnoLab Hackson issue Asset ");
-
-//????
+// it needs transaction actually
             service.issue(assetAddress, assetAccountAddress, amount);
 
 
