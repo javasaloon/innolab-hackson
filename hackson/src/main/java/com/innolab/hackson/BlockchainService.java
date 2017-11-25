@@ -5,12 +5,12 @@ import cn.bubi.baas.account.Application;
 import cn.bubi.baas.account.tenant.Tenant;
 import cn.bubi.baas.account.tenant.TenantInfo;
 import cn.bubi.baas.account.tenant.TenantManageService;
-import cn.bubi.baas.asset.Asset;
 import cn.bubi.baas.asset.AssetAccountInfo;
 import cn.bubi.baas.asset.AssetInfo;
 import cn.bubi.baas.asset.AssetManageService;
 import cn.bubi.baas.base.BlockchainCertificate;
 import cn.bubi.baas.base.security.SecureIdentity;
+import cn.bubi.baas.data.DataService;
 import cn.bubi.baas.sdk.*;
 
 public class BlockchainService {
@@ -33,20 +33,107 @@ public class BlockchainService {
 
         BlockchainAccount user = blockchainService.createUser(app, operator);
 
-        String asset = blockchainService.createAsset(app, operator);
-        String assetAccount = blockchainService.createAssetAccount(app, operator);
+        String asset = blockchainService.createAsset(user);
+        String assetAccount = blockchainService.createAssetAccount( user);
+        String txHash = blockchainService.issueAsset(asset, assetAccount, 3, user);
 
-
+        String result = blockchainService.insertData(user);
     }
 
-    private String createAssetAccount(BlockchainAccount app, BlockchainAccount user) {
+    //???
+
+
+    private String insertData(BlockchainAccount user) {
+
+        System.out.println("insert data ... ");
+
+        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+
+        BlockchainSession session = serviceFactory.createSession(userId);  //  ????
+        String txHash = null;
+        TransactionTemplate tx = session.beginTransaction();
+        try {
+            DataService service = tx.forService(DataService.class);
+
+            AssetAccountInfo<String> info = new AssetAccountInfo<>();
+            info.setDescription("InnoLab Hackson issue Asset ");
+            BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
+
+            tx.prepare(service.insert(identity, new UserData()), String.class);
+
+            PreparedTransaction ptx = tx.complete();
+            try {
+                txHash = ptx.getHash();
+                System.out.printf(txHash);
+                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(identity.getAddress());
+            return identity.getAddress();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    private String issueAsset(String assetAddress, String assetAccountAddress, long amount, BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
-        SecureIdentity appId = new SecureIdentity(app.getAccount().getAddress(), app.getPrivKey());
         SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
 
-        BlockchainSession session = serviceFactory.createSession(appId, userId);  //  ????
+        BlockchainSession session = serviceFactory.createSession(userId);  //  ????
+        String txHash = null;
+        TransactionTemplate tx = session.beginTransaction();
+        try {
+            AssetManageService service = tx.forService(AssetManageService.class);
+
+            AssetAccountInfo<String> info = new AssetAccountInfo<>();
+            info.setDescription("InnoLab Hackson issue Asset ");
+
+//????
+            service.issue(assetAddress, assetAccountAddress, amount);
+
+
+            PreparedTransaction ptx = tx.complete();
+            try {
+                txHash = ptx.getHash();
+                System.out.printf(txHash);
+                ptx.sign(user.getAccount().getAddress(), user.getPrivKey());
+                try {
+                    ptx.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(txHash);
+            return txHash;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String createAssetAccount(BlockchainAccount user) {
+
+        System.out.println("create user ... ");
+
+        SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
+
+        BlockchainSession session = serviceFactory.createSession(userId);  //  ????
 
         TransactionTemplate tx = session.beginTransaction();
         try {
@@ -85,14 +172,13 @@ public class BlockchainService {
 
 
     // ? can user create asset?
-    private String createAsset(BlockchainAccount app, BlockchainAccount user) {
+    private String createAsset(BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
-        SecureIdentity appId = new SecureIdentity(app.getAccount().getAddress(), app.getPrivKey());
         SecureIdentity userId = new SecureIdentity(user.getAccount().getAddress(), user.getPrivKey());
 
-        BlockchainSession session = serviceFactory.createSession(appId, userId);
+        BlockchainSession session = serviceFactory.createSession(userId);
 
         TransactionTemplate tx = session.beginTransaction();
         try {
@@ -100,7 +186,7 @@ public class BlockchainService {
             BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
 
 
-            AssetInfo<String>  info = new AssetInfo();
+            AssetInfo<String> info = new AssetInfo();
             info.setDescription("InnoLab Hackson Asset");
             tx.prepare(service.declare(identity, info), String.class);
 
@@ -155,7 +241,7 @@ public class BlockchainService {
                 newEntry = resultHolder.getResult();
                 newAccount.setAccount(newEntry);
                 newAccount.setPrivKey(identity.getAuthPrivateKey().getEncodedValue());
-                ptx.sign(app.getAccount().getAddress(), app.getPrivKey());
+                ptx.sign(operator.getAccount().getAddress(), operator.getPrivKey());
                 try {
                     ptx.commit();
                 } catch (Exception e) {
