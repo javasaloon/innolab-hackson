@@ -20,6 +20,7 @@ public class BlockchainService {
     private static final BlockchainServiceFactory serviceFactory = new BlockchainServiceFactory(BAAS_HOST, BAAS_PORT);
 
 
+
     public static void main(String[] args) {
         BlockchainDao dao = new BlockchainDao();
         BlockchainService blockchainService = new BlockchainService();
