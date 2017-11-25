@@ -159,6 +159,21 @@ public class HacksonController {
         return user;
     }
 
+    @RequestMapping(path = "/reborn", method = RequestMethod.POST)
+    public Battle join_group(@RequestParam(value = "boss_id") long boss_id) {
+        Boss boss = bossList.get(((int) boss_id) - 1);
+        boss.setCur_health(boss.getMax_health());
+        boss.setLive(true);
+        List<Battle> list = map.get(boss_id);
+        Battle battle = new Battle();
+        battle.setB(boss);
+        battle.setId(event_id);
+        battle.setIs_reborn(true);
+        event_id++;
+        list.add(battle);
+        return battle;
+    }
+
     private static double getRandom(int min, int max) {
         return (Math.random() * (max - min) + min);
     }
