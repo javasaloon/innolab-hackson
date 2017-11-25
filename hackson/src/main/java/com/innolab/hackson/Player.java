@@ -1,6 +1,6 @@
 package com.innolab.hackson;
 
-public class Player {
+public class Player implements Cloneable{
     long user_id;
 
     long group_id;
@@ -60,4 +60,15 @@ public class Player {
         return level;
     }
 
+    @Override
+    public Object clone()
+    {
+        Player user = null;
+        try{
+            user = (Player)super.clone();
+        }catch(CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
 }
