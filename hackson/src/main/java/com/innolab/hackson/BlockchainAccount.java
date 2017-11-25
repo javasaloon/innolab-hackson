@@ -23,4 +23,9 @@ public class BlockchainAccount {
     public String getPrivKey() {
         return privKey;
     }
+
+    @Override
+    public String toString() {
+        return " ======================> " + account.getAccountType().name() + "; " + account.getAddress() + "; " + privKey;
+    }
 }
