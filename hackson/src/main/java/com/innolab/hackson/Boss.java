@@ -3,6 +3,8 @@ package com.innolab.hackson;
 public class Boss implements Cloneable{
     long boss_id;
 
+    int r;
+
     String boss_name;
 
     int max_health;
@@ -12,6 +14,14 @@ public class Boss implements Cloneable{
     Point location;
 
     boolean isLive;
+
+    public int getR() {
+        return r;
+    }
+
+    public void setR(int r) {
+        this.r = r;
+    }
 
     public boolean isLive() {
         return isLive;
