@@ -8,7 +8,7 @@ public class BlockchainDao {
     ObjectMapper mapper = new ObjectMapper();
 
 
-    public void saveAccount(String type, BlockchainAccount account) {
+    public void saveAccount(String type, Object account) {
         try {
             File file = new File(type + ".json");
 
@@ -22,11 +22,23 @@ public class BlockchainDao {
     }
 
     public BlockchainAccount getAccount(String type) {
-        String jsonInString = null;
         try {
             File file = new File(type + ".json");
 
             return mapper.readValue(file, BlockchainAccount.class);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public <T> T read(String type, Class<T> valueType) {
+        try {
+            File file = new File(type + ".json");
+
+            return mapper.readValue(file, valueType);
 
 
         } catch (Exception e) {

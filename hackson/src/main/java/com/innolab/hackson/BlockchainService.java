@@ -55,13 +55,17 @@ public class BlockchainService {
         BlockchainAccount user2 = dao.getAccount("user2");
         System.out.println(user2);
 
+//        Card asset = blockchainService.createAsset(user1);
+//        dao.saveAccount("user1-card", asset);
+//        CardAccount assetAccount = blockchainService.createAssetAccount(user1);
+//        dao.saveAccount("user1-asset-account", assetAccount);
+
+        Card asset = dao.read("user1-card", Card.class);
+        System.out.println(asset);
+        CardAccount assetAccount = dao.read("user1-asset-account", CardAccount.class);
+        System.out.println(assetAccount);
 
 
-
-
-//
-//        String asset = blockchainService.createAsset(user);
-//        String assetAccount = blockchainService.createAssetAccount( user);
 //        String txHash = blockchainService.issueAsset(asset, assetAccount, 3, user);
 //
 //        String result = blockchainService.insertData(user);
@@ -154,9 +158,12 @@ public class BlockchainService {
         return null;
     }
 
-    public String createAssetAccount(BlockchainAccount user) {
+    public CardAccount createAssetAccount(BlockchainAccount user) {
 
         System.out.println("create user ... ");
+
+        CardAccount cardAccount = new CardAccount();
+
 
         SecureIdentity userId = new SecureIdentity(user.getAddress(), user.getPrivKey());
 
@@ -178,6 +185,7 @@ public class BlockchainService {
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
+                cardAccount.setCode(txHash);
                 ptx.sign(user.getAddress(), user.getPrivKey());
                 try {
                     ptx.commit();
@@ -189,17 +197,18 @@ public class BlockchainService {
                 e.printStackTrace();
             }
             System.out.println(identity.getAddress());
-            return identity.getAddress();
+            cardAccount.setAddress(identity.getAddress());
+            return cardAccount;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return cardAccount;
     }
 
 
     // ? can user create asset?
-    public String createAsset(BlockchainAccount user) {
+    public Card createAsset(BlockchainAccount user) {
 
         System.out.println("create user ... ");
 
@@ -208,6 +217,9 @@ public class BlockchainService {
         BlockchainSession session = serviceFactory.createSession(userId);
 
         TransactionTemplate tx = session.beginTransaction();
+
+        Card card = new Card();
+
         try {
             AssetManageService service = tx.forService(AssetManageService.class);
             BlockchainCertificate identity = session.getSecureKeyGenerator().generateBubiCertificate();
@@ -221,7 +233,10 @@ public class BlockchainService {
             try {
                 String txHash = ptx.getHash();
                 System.out.printf(txHash);
+                card.setCode(txHash);
                 ptx.sign(user.getAddress(), user.getPrivKey());
+                card.setAddress(identity.getAddress());
+
                 try {
                     ptx.commit();
                 } catch (Exception e) {
@@ -232,12 +247,12 @@ public class BlockchainService {
                 e.printStackTrace();
             }
             System.out.println(identity.getAddress());
-            return identity.getAddress();
+            return card;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return card;
     }
 
     public BlockchainAccount createUser(BlockchainAccount app, BlockchainAccount operator) {
